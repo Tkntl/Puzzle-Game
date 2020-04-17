@@ -1,5 +1,6 @@
 
 int fillPuzzle(int gridSize,int pGrid[][gridSize], int *zeroPos);
+int isPuzzleSolvable(int gridSize,int (*pGrid)[gridSize], int zeroLine);
 void printPuzzle(int gridSize, int (*pGrid)[gridSize]);
 int testIfsolved(int gridSize, int (*pGrid)[gridSize]);
 char readInput(int mode);

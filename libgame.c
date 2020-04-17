@@ -27,6 +27,45 @@ int fillPuzzle(int gridSize, int (*pGrid)[gridSize], int *zeroPos) {
     return 0;
 }
 
+int isPuzzleSolvable(int gridSize, int (*pGrid)[gridSize], int zeroLine) {
+    
+    int number;
+    int isSmaller = 0;
+    int inversions = 0;
+    int num[gridSize*gridSize-1];
+    int index = 0;
+    int isZeroLineOdd;
+    
+    for(int y = 0;y < gridSize;y++){
+        for(int x = 0;x < gridSize; x++) {
+            if( *(*(pGrid + y) + x) != 0) {
+                number =  *(*(pGrid + y) + x);
+                num[index] =  *(*(pGrid + y) + x);
+                    for(int i = 0;i <= index; i++){
+                        if(num[i] < number){
+                            isSmaller++;
+                        }
+                    }
+                inversions += number - isSmaller -1;
+                isSmaller = 0;
+                index++;
+            }
+        }
+    }
+    if((gridSize % 2 == 1) && (inversions % 2 == 0))
+        return 1;
+    else if(gridSize % 2 == 0 && inversions != 0) {
+        isZeroLineOdd = (gridSize-zeroLine) % 2;
+        //isZeroLineOdd = zeroLine % 2;
+        if((inversions % 2 == 0 && isZeroLineOdd == 0) || (inversions % 2 == 1 && isZeroLineOdd == 1)){
+            //printf("inversions %d -- %d Even Or Odd %d -- 1 = odd 0 = even",inversions,inversions %2, isZeroLineOdd);
+            return 1;
+        }
+    }
+    
+    return 0;
+}
+
 void printPuzzle(int gridSize, int (*pGrid)[gridSize]) {
     
     for(int y = 0;y < gridSize;y++) {

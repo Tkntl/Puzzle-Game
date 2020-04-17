@@ -43,7 +43,11 @@ int main(int argc, char *argv[]) {
     int pGrid[gridSize][gridSize];
     
     //init puzzle
-    fillPuzzle(gridSize, pGrid, zeroPos);
+    int solvablePuzzle = 0;
+    while(solvablePuzzle == 0) {
+        fillPuzzle(gridSize, pGrid, zeroPos);
+        solvablePuzzle = isPuzzleSolvable(gridSize,pGrid,zeroPos[0]);
+    }
     
     printf("\nPuzzle is Ready\n\n");
     
@@ -63,7 +67,6 @@ int main(int argc, char *argv[]) {
             moves++;
         else
             printf("Illegal move\n");
-     //   printf("%d - %d\n",zeroPos[0],zeroPos[1]);
       
     }
     printf("You won!\nYou used %d moves\n",moves);
