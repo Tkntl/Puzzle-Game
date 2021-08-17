@@ -34,7 +34,6 @@ int getRandNum(int size) {
     number = rnd % size;
         
     return number;
-    //printf("Random number = 0x%x\n", rnd);
 }    
     
 char randSolve(void) {
@@ -58,7 +57,6 @@ char randSolve(void) {
         default :
             printf("ERROR");
     }
-    //printf("Random number = 0x%x\n", rnd);
 }
 
 
@@ -76,15 +74,13 @@ char randSolve2(int size, int data[][size]){
     
     for(int y = 0;y < size;y++){
         for(int x = 0;x < size;x++){
-            //printf("%d ", data[y][x]);
-            
             if(data[y][x] == 0) {
                 zero[0] = y;
                 zero[1] = x;
             }
         }
     }
-    //printf("zero = %d,%d", zero[0], zero[1]);
+
     while(1) {
         rnd = getURandom();
     
@@ -114,7 +110,6 @@ char randSolve2(int size, int data[][size]){
                 printf("ERROR");
         }
     
-        //printf("%c - %d\n", move, dire);
         if((newZero[0] >= 0 && newZero[0] < size) && (newZero[1] >= 0 && newZero[1] < size)){
             if(newZero[0] > 0)
                 correct = newZero[0]*3+newZero[1];
@@ -127,7 +122,6 @@ char randSolve2(int size, int data[][size]){
                 return move;
         }
         cntr++;
-        //printf("%d\n", correct);
     }
 }
     

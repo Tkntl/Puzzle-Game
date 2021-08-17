@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "randomi.h"
+#include "searchAgent.h"
 
 int fillPuzzle(int gridSize, int (*pGrid)[gridSize], int *zeroPos) {
       
@@ -56,11 +57,9 @@ int isPuzzleSolvable(int gridSize, int (*pGrid)[gridSize], int zeroLine) {
         return 1;
     else if(gridSize % 2 == 0 && inversions != 0) {
         isZeroLineOdd = (gridSize-zeroLine) % 2;
-        //isZeroLineOdd = zeroLine % 2;
-        if((inversions % 2 == 0 && isZeroLineOdd == 0) || (inversions % 2 == 1 && isZeroLineOdd == 1)){
-            //printf("inversions %d -- %d Even Or Odd %d -- 1 = odd 0 = even",inversions,inversions %2, isZeroLineOdd);
+        
+        if((inversions % 2 == 0 && isZeroLineOdd == 0) || (inversions % 2 == 1 && isZeroLineOdd == 1))
             return 1;
-        }
     }
     
     return 0;
@@ -126,7 +125,8 @@ char readInput2(int mode, int gridSize, int pGrid[][gridSize]) {
     
     if(mode == 3)
         input = randSolve2(gridSize, pGrid);
-    
+    else if (mode == 4)
+        input = searchAgent(gridSize,pGrid);
     return input;
 }
 

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     char input;
     
 
-    while((opt = getopt(argc, argv, "MARS:")) != -1)
+    while((opt = getopt(argc, argv, "MARBS:")) != -1)
         switch(opt){
             case 'M':
                 mode = 1;
@@ -30,13 +30,18 @@ int main(int argc, char *argv[]) {
                 mode = 3;
                 needs = 1;
                 break;
+             case 'B':
+                mode = 4;
+                needs = 1;
+                break;
             case 'S' :
                 gridSize = atoi(optarg);
                 break;
         }
         
     if(mode == 0){
-        printf("\nusage: puzzle -Option\n\n-M Manual solve\n-A use random solve\n-R use random solve 2\n-S size");
+        printf("\nusage: puzzle -Option\n\n");
+        printf("-M Manual solve\n-A use random solve\n-R use random solve with neighbour check\n-B best-first search\n-S size");
         exit(13);
     }
 

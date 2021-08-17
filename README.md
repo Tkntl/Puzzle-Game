@@ -8,4 +8,5 @@ Game uses /dev/urandom to fill puzzle.
 Usage: puzzle -Options -S <size>
     -M manual solve
     -A Random solve
-    -R Random solve with check if number is in correct place  
+    -R Random solve with check if number is in correct place
+    -B best-first search
