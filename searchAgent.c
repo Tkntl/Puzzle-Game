@@ -258,7 +258,9 @@ char * agentFlow(int gridSize, int grid[][gridSize])
             
             (nodes + cntr + i)->digits = testState(gridSize, (nodes + cntr + i)->data);          
             if((nodes + cntr + i)->digits == 0){
-                return (nodes + cntr + i)->moves;
+                char *retVal = malloc(sizeof((nodes + cntr + i)->moves) + 1 * sizeof(char));
+                strcpy(retVal, (nodes + cntr + i)->moves);
+                return retVal;
             } 
             
             if(dropMove(moves[mCntr], (nodes + cntr + i)->moves[depthCntr - 1], (nodes + cntr + i)->digits, depthCntr, dropLimit))
