@@ -55,7 +55,6 @@ int testState(int gridSize, int *arrs)
     int yAxel[gridSize];
     int yRow;
     int xRow;
-    int found;
 
     for(int y = 0; y < gridSize; y++){
         for(int x = 0;x < gridSize; x++){
@@ -126,9 +125,7 @@ int dropMove(char move, char oldMove, int digits, int depthCntr, int dropLimit)
 
 int hashFunction(int size, int *data)
 {   
-    int tmp;
     int hash = 0;
-    int hash2 = 0;
 
         for(int x = 0; x < (size * size); x++){
             hash = hash * 10;
@@ -171,16 +168,15 @@ char * agentFlow(int gridSize, int grid[][gridSize])
     
     int nOfmoves = 0;
     
-    int NumOfNodes = 1;
-    int NumOfNodesNext = 0;
     int depthCntr = 0;
-    int nodeCntr = 0;
     
     int dropLimit;
     
     int tRows = gridSize * gridSize;
     int arraySize = tRows * sizeof(int);
-    int nodeArraySize;
+    int nodeArraySize = 100;
+    int mallocNewspace = 0;
+    char *retVal;
     
     struct node {
         int data[tRows];
@@ -198,18 +194,20 @@ char * agentFlow(int gridSize, int grid[][gridSize])
     struct closest smallestVal;
     
     dropLimit = getLimit(gridSize);
+    smallestVal.min = dropLimit;
     nOfmoves = strlen(moves);
     
-    nodes = malloc((1 + nOfmoves) * sizeof(*nodes));
-    nodeArraySize = 1+ nOfmoves;
+    nodes = malloc(nodeArraySize * sizeof(*nodes)); 
     (nodes)->moves = malloc((depthCntr + 1) * sizeof(char));
     
     for(int y = 0; y < gridSize; y++)
                 for(int x = 0;x < gridSize; x++)
                         (nodes + Rcntr)->data[y * gridSize + x] = grid[y][x];
     (nodes + Rcntr)->digits = testState(gridSize, (nodes + Rcntr)->data);
-    cntr++;
+    (nodes + Rcntr)->depthCntr = 0;
+    (nodes + Rcntr)->moves[0] = '\0';
     
+    cntr++;
     while(1) {
         
         for(int y = 0; y < gridSize; y++)
@@ -223,9 +221,9 @@ char * agentFlow(int gridSize, int grid[][gridSize])
         strcpy(moves,availableMoves(zero, gridSize));
         
         nOfmoves = strlen(moves);
-
         for(int i = 0, mCntr = 0; i < nOfmoves; mCntr++) {
             memcpy((nodes + cntr + i)->data,(nodes + Rcntr)->data,arraySize);
+            (nodes + cntr + i)->visited = 0;
                                
             if (moves[mCntr] == 'w'){
                 
@@ -248,47 +246,49 @@ char * agentFlow(int gridSize, int grid[][gridSize])
                 (nodes + cntr + i)->data[zero[0] * gridSize + zero[1]] = (nodes + cntr + i)->data[zero[0] * gridSize + (zero[1] + 1)];
                 (nodes + cntr + i)->data[zero[0] * gridSize + (zero[1] + 1)] = 0;
             }
-            (nodes + cntr + i)->moves = malloc(((nodes + Rcntr)->depthCntr + 2) * sizeof(char));
-            
+            if(mallocNewspace && i == 0)
+                (nodes + cntr + i)->moves = realloc((nodes + cntr + i)->moves,((nodes + Rcntr)->depthCntr + 2) * sizeof(char));
+            else if(!mallocNewspace) {
+                mallocNewspace = 1;
+                (nodes + cntr + i)->moves = malloc(((nodes + Rcntr)->depthCntr + 2) * sizeof(char));
+            }
             strcpy((nodes + cntr + i)->moves, (nodes + Rcntr)->moves);
             
             (nodes + cntr + i)->moves[(nodes + Rcntr)->depthCntr] = moves[mCntr];
-
             (nodes + cntr + i)->moves[(nodes + Rcntr)->depthCntr + 1] = '\0';
-            
-            (nodes + cntr + i)->digits = testState(gridSize, (nodes + cntr + i)->data);          
+            (nodes + cntr + i)->digits = testState(gridSize, (nodes + cntr + i)->data);
             if((nodes + cntr + i)->digits == 0){
-                char *retVal = malloc(sizeof((nodes + cntr + i)->moves) + 1 * sizeof(char));
+                retVal = malloc((strlen((nodes + cntr + i)->moves) + 1) * sizeof(char));
                 strcpy(retVal, (nodes + cntr + i)->moves);
+                for(int freeMoves = 0; freeMoves <= (cntr + i); freeMoves++)
+                    free((nodes + freeMoves)->moves);
+    
+                free(nodes);
                 return retVal;
             } 
-            
-            if(dropMove(moves[mCntr], (nodes + cntr + i)->moves[depthCntr - 1], (nodes + cntr + i)->digits, depthCntr, dropLimit))
+            /*if(dropMove(moves[mCntr], (nodes + cntr + i)->moves[depthCntr - 1], (nodes + cntr + i)->digits, depthCntr, dropLimit))
                 nOfmoves--;
             
-            else{
-                int notInTheList = 1;
-                for(int Dcntr = cntr + i - 1; Dcntr >= 0; Dcntr--)
-                    if((nodes + cntr + i)->digits == (nodes + Dcntr)->digits)
+            */
+            int notInTheList = 1;
+            for(int Dcntr = cntr + i - 1; Dcntr >= 0; Dcntr--){
+                if((nodes + cntr + i)->digits == (nodes + Dcntr)->digits)
                     if(memcmp((nodes + cntr + i)->data,(nodes + Dcntr)->data,arraySize) == 0){
                         nOfmoves--;
                         notInTheList = 0;
                         break;
                     }
-                
-                if(notInTheList){
-                    
-                    (nodes + cntr + i)->depthCntr = (nodes +Rcntr)->depthCntr + 1;
-                    
-                    i++;
-                }
+            }
+            if(notInTheList){
+                (nodes + cntr + i)->depthCntr = (nodes +Rcntr)->depthCntr + 1;
+                mallocNewspace = 0;
+                i++;
             }
         }
         
         (nodes + Rcntr)->visited = 1;
          
         cntr += nOfmoves;
-    
         if((nodeArraySize - 4 < cntr)){
             nodes = realloc(nodes,(2 * nodeArraySize) * sizeof(*nodes));
             nodeArraySize = nodeArraySize * 2;
@@ -309,14 +309,19 @@ char searchAgent(int size, int data[][size])
 {
     static int calculated = 0;
     static int charCntr = 0;
-    static char * moveArray;
-
+    static char *moveArray;
+    
     if(!calculated){
         moveArray = agentFlow(size, data);
         calculated = 1;
     }
     else
         charCntr++;
-    
+    if(moveArray[charCntr] == '\0') {
+        calculated = 0;
+        charCntr = 0;
+        free(moveArray);
+        return '\0';
+    }
     return moveArray[charCntr];
 }
