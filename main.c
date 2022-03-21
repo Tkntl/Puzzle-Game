@@ -3,6 +3,9 @@
 #include "randomi.h"
 #include "libgame.h"
 #include <unistd.h>
+#include <time.h>
+
+#define CLOCK_TYPE CLOCK_MONOTONIC_RAW
 
 int main(int argc, char *argv[]) {
     
@@ -16,6 +19,7 @@ int main(int argc, char *argv[]) {
     int cont = 1;
     int moves = 0;
     char input;
+    struct timespec startTime_val, stopTime_val, startTime_res;
     
 
     while((opt = getopt(argc, argv, "MARBS:")) != -1)
@@ -56,6 +60,8 @@ int main(int argc, char *argv[]) {
     
     printf("\nPuzzle is Ready\n\n");
     
+    clock_gettime(CLOCK_TYPE, &startTime_val);
+    clock_getres(CLOCK_TYPE, &startTime_res);
     while(cont) {
         
         printPuzzle(gridSize, pGrid);
@@ -74,5 +80,8 @@ int main(int argc, char *argv[]) {
             printf("Illegal move\n");
       
     }
+    clock_gettime(CLOCK_TYPE, &stopTime_val);
     printf("You won!\nYou used %d moves\n",moves);
+    
+    printf("in %ld uS\n", (stopTime_val.tv_sec*1000000 + stopTime_val.tv_nsec/1000)-(startTime_val.tv_sec*1000000 + startTime_val.tv_nsec/1000));
 }
